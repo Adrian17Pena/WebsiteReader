@@ -1,0 +1,148 @@
+//File Name: assign3_aap89.cpp
+//
+// Author: (Adrian Pena)
+// Date: 6/22/2021
+// Assignment Number: 3
+// CS 2308 Summer 2021
+// Instructor: Dr. J. Marcos Palacios
+//
+
+#include<iostream>
+#include<cmath>
+#include<iomanip>
+#include<fstream>
+using namespace std;
+
+struct Website
+{
+    string title;
+    string url;
+    int score;
+};
+
+//***********************************************************
+// display: Outputs the titles and url of the websites with
+// the correct mode.
+//***********************************************************
+void display(int mode, Website *nPtr, int SIZE)
+{
+    for(int i=0; i<SIZE; i++)
+    {
+        if((nPtr+i)->score==mode)
+        cout<<(nPtr+i)->title<<endl<<(nPtr+i)->url<<endl<<endl;
+    }
+}
+
+//***********************************************************
+// fileInput: Reads in from a txt file and returns the pointer
+// of the struct array
+//
+// param-1:Website *nPtr, pointer of the struct array
+// param-2:SIZE, used to determine the size of the struct array
+// returns: Returns the first address of the struct array
+//***********************************************************
+Website *fileInput(Website *nPtr, int SIZE)
+{
+    int index=0;                //used to get rid of the first element in the txt
+    ifstream file;
+    file.open("program3stories.txt");
+    if(!file)
+    {
+        cout<<"File failed to open"<<endl;
+    }
+    file>>index>>ws;
+    for(int i=0; i<SIZE; i++)
+    {
+        getline(file, (nPtr+i)->title);
+        file>>ws;
+        getline(file, (nPtr+i)->url);
+        file>>ws;
+        file>>(nPtr+i)->score;
+        file>>ws;
+
+    }
+    file.close();
+    return nPtr;
+}
+
+//***********************************************************
+// sorting: Uses a bubble sort to sort the struct array from
+// greatest score to lowest score
+//
+// param-1:Website *nPtr, pointer of the struct array
+// param-2:SIZE, used to determine the size of the struct array
+//***********************************************************
+void sorting(Website *nPtr, int SIZE)
+{
+    bool swap;
+    Website temp;
+        do
+        {
+            swap=false;
+            for(int i=0; i<SIZE;i++)
+            {
+                if(((nPtr+i)->score)>((nPtr+i+1)->score))
+                {
+                    temp=*(nPtr+i);
+                    *(nPtr+i)=*(nPtr+i+1);
+                    *(nPtr+i+1)=temp;
+                    swap=true;
+                }
+            }
+        }while(swap);
+}
+
+//***********************************************************
+// find Mode:Checks through the whole array and finds the
+// score that was seen the most and identifies it as the mode
+//
+// param-1:Website *nPtr, pointer of the struct array
+// param-2:SIZE, used to determine the size of the struct array
+//***********************************************************
+int findMode(Website *nPtr, int SIZE)
+{
+    sorting(nPtr, SIZE);
+    int countIndex=1;
+    int MAX=1;
+    int x=-1;
+
+    for (int i=0; i<SIZE; i++)
+    {
+        if(((nPtr+i)->score)==((nPtr+i+1)->score))
+        {
+            countIndex++;
+            if(countIndex>MAX)
+            {
+                MAX=countIndex;
+                x=((nPtr+i)->score);
+            }
+        }
+        else
+        {
+            countIndex=1;
+        }
+    }
+    return x;
+}
+
+int main()
+{
+    int SIZE;
+    ifstream file;
+
+    file.open("program3stories.txt");
+    file>>SIZE;
+    file.close();
+    int mode;
+
+    Website *nPtr= new Website [SIZE];
+
+    fileInput(nPtr, SIZE);
+    mode=findMode(nPtr, SIZE);
+
+    cout<<"Mode: "<<mode<<endl<<endl;
+    display(mode, nPtr, SIZE);
+
+
+    return 0;
+}
